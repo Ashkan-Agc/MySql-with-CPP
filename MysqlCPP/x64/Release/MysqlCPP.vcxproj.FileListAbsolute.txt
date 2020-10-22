@@ -1,0 +1,2 @@
+C:\Users\Ashkan\Desktop\MysqlCPP\x64\Release\MysqlCPP.exe
+E:\Workspace\C++\MySql-with-CPP\MysqlCPP\x64\Release\MysqlCPP.exe
