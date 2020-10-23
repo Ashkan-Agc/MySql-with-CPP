@@ -1,2 +1,0 @@
-C:\Users\Ashkan\Desktop\MysqlCPP\Debug\MysqlCPP.exe
-C:\Users\Ashkan\Desktop\MysqlCPP\Debug\MysqlCPP.pdb
