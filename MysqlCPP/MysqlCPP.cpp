@@ -1,5 +1,4 @@
 #include <mysql.h>
-
 #include <iostream>
 
 using namespace std;
@@ -11,17 +10,18 @@ MYSQL_ROW row;
 MYSQL_RES* res;
 
 
-class QueryInstructions
+class QueryTools
 {
 public:
 	void connentDatabase(const char* server, const char* username, const char* password, const char* database, int port);
-	void printData(string table);
+	void printTable(string table);
+	void printData(MYSQL_RES* data);
 	void runQuery(string query);
+	void search(string table, string column, string key);
 private:
-	MYSQL_ROW row;
 	int num_fields;
 };
-void QueryInstructions::connentDatabase(const char* server, const char* username, const char* password, const char* database, int port) {
+void QueryTools::connentDatabase(const char* server, const char* username, const char* password, const char* database, int port) {
 	conn = mysql_init(0);
 	conn = mysql_real_connect(conn, server, username, password, database, port, NULL, 0);
 	if (conn) {
@@ -33,9 +33,9 @@ void QueryInstructions::connentDatabase(const char* server, const char* username
 		exit(0);
 	}
 }
-void QueryInstructions::runQuery(string query) {
+void QueryTools::runQuery(string query) {
 	qstate = mysql_query(conn, query.c_str());
-	if (qstate ==0)
+	if (qstate == 0)
 	{
 		cout << "query: <<" << query << ">>executed successfully :)" << endl;
 	}
@@ -44,9 +44,9 @@ void QueryInstructions::runQuery(string query) {
 		cout << ":( Query failed: " << mysql_error(conn) << endl;
 	}
 }
-void QueryInstructions::printData(string table)
+void QueryTools::printTable(string table)
 {
-	string query = "SELECT * FROM student";
+	string query = "SELECT * FROM " + table;
 	mysql_query(conn, query.c_str());
 	res = mysql_store_result(conn);
 	num_fields = mysql_num_fields(res);
@@ -57,28 +57,42 @@ void QueryInstructions::printData(string table)
 		{
 			cout << row[i] << "\t";
 		}
-		cout << "\n";
+		cout << endl;
 	}
 	cout << "-----------------------------------------" << endl;
 	mysql_free_result(res);//clear result set from memory
+}
+void QueryTools::printData(MYSQL_RES* data) {
+	num_fields = mysql_num_fields(data);
+	while ((row = mysql_fetch_row(data)))
+	{
+		for (int i = 0; i <= num_fields; i++)
+		{
+			cout << row[i] << "\t";
+		}
+		cout << endl;
+	}
+}
+void QueryTools::search(string table, string column, string key)
+{
+	string q = "select * from " + table + " where "+ column + " = " + key;
+	runQuery(q);
+	mysql_commit(conn);
+	res = mysql_store_result(conn);
+	
+	cout << "-------------------search result----------------------" << endl;
+	cout << "found : " << mysql_num_rows(res) << endl;
+	printData(res);
 }
 
 
 int main()
 {
-	QueryInstructions instructions;
+	QueryTools instructions;
 	instructions.connentDatabase("localhost", "root", "ashkan79", "test", 3306);
-	instructions.runQuery("");
-	instructions.printData("student");
-	mysql_commit(conn);
-	if (0)
-	{
-		cout << "successd" << endl;
-	}
-	else {
-		cout << "error";
-	}
-	
+	//instructions.runQuery("select * from student");
+	//instructions.printData("student");
+	instructions.search("student", "age", "43");
 	mysql_close(conn);//close initialize connection
 	return 0;
 }
