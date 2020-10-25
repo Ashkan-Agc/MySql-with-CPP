@@ -35,7 +35,7 @@ void QueryInstructions::connentDatabase(const char* server, const char* username
 }
 void QueryInstructions::runQuery(string query) {
 	qstate = mysql_query(conn, query.c_str());
-	if (!qstate)
+	if (qstate ==0)
 	{
 		cout << "query: <<" << query << ">>executed successfully :)" << endl;
 	}
@@ -60,6 +60,7 @@ void QueryInstructions::printData(string table)
 		cout << "\n";
 	}
 	cout << "-----------------------------------------" << endl;
+	mysql_free_result(res);//clear result set from memory
 }
 
 
@@ -69,6 +70,15 @@ int main()
 	instructions.connentDatabase("localhost", "root", "ashkan79", "test", 3306);
 	instructions.runQuery("");
 	instructions.printData("student");
-	mysql_free_result(res);//clear result set from memory
+	mysql_commit(conn);
+	if (0)
+	{
+		cout << "successd" << endl;
+	}
+	else {
+		cout << "error";
+	}
+	
+	mysql_close(conn);//close initialize connection
 	return 0;
 }
